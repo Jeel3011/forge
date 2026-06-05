@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ project_type | replace("_", "-") }}-config
+data:
+  DEBUG: "false"
+{% if needs_redis %}
+  REDIS_URL: "redis://redis:6379/0"
+{% endif %}
+---
+# Store secrets separately — fill these in before applying
+# kubectl create secret generic {{ project_type | replace("_", "-") }}-secrets \
+{% if "openai" in detected_deps %}
+#   --from-literal=OPENAI_API_KEY=your_key \
+{% endif %}
+{% if "anthropic" in detected_deps %}
+#   --from-literal=ANTHROPIC_API_KEY=your_key \
+{% endif %}
+#   --from-literal=SECRET_KEY=$(openssl rand -hex 32)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ project_type | replace("_", "-") }}-secrets
+type: Opaque
+stringData:
+{% if "openai" in detected_deps %}
+  OPENAI_API_KEY: "REPLACE_ME"
+{% endif %}
+{% if "anthropic" in detected_deps %}
+  ANTHROPIC_API_KEY: "REPLACE_ME"
+{% endif %}
+  SECRET_KEY: "REPLACE_ME"
+  DATABASE_URL: "postgresql://user:password@db:5432/app"

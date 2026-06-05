@@ -212,7 +212,7 @@ export default function Diagnose() {
             <div className="space-y-1">
               <div className="text-xs text-forge-muted uppercase tracking-wider">Detected project type</div>
               <div className="text-2xl font-bold text-forge-white">{PROJECT_LABELS[scan.project_type]}</div>
-              <div className="text-sm text-forge-subtle font-mono">{scan.repo_url}</div>
+              <div className="text-sm text-forge-subtle font-mono truncate max-w-xs">{scan.repo_url}</div>
             </div>
             <div className="text-right flex-shrink-0">
               <div className="text-3xl font-black text-forge-white">{Math.round(scan.confidence * 100)}%</div>
@@ -220,8 +220,28 @@ export default function Diagnose() {
             </div>
           </div>
 
+          {/* AI reasoning */}
+          {scan.ai_reasoning && !scan.ai_reasoning.includes("skipped") && (
+            <div className="flex gap-2.5 bg-forge-surface rounded-lg px-3 py-2.5 border border-forge-border">
+              <svg className="flex-shrink-0 mt-0.5" width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <circle cx="6.5" cy="6.5" r="5.5" stroke="#666" strokeWidth="1.2"/>
+                <path d="M6.5 5.5v4M6.5 4h.01" stroke="#666" strokeWidth="1.4" strokeLinecap="round"/>
+              </svg>
+              <p className="text-xs text-forge-text leading-relaxed">{scan.ai_reasoning}</p>
+            </div>
+          )}
+
+          {/* Metadata row */}
+          <div className="flex gap-4 text-xs text-forge-muted border-t border-forge-border pt-3">
+            <span>{scan.files_scanned} files scanned</span>
+            <span>{scan.detected_dependencies.length} packages</span>
+            {scan.l1_confidence !== scan.confidence && (
+              <span>L1 {Math.round(scan.l1_confidence * 100)}% → AI {Math.round(scan.confidence * 100)}%</span>
+            )}
+          </div>
+
           {scan.detected_characteristics.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-forge-border">
+            <div className="flex flex-wrap gap-2 border-t border-forge-border pt-3">
               {scan.detected_characteristics.map((c) => (
                 <span key={c} className="text-xs px-2.5 py-1 rounded-full bg-forge-surface border border-forge-border text-forge-text font-mono">
                   {c}

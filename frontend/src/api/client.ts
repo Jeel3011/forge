@@ -9,8 +9,11 @@ export interface ScanResult {
   repo_url: string;
   project_type: string;
   confidence: number;
+  l1_confidence: number;
+  ai_reasoning: string;
   detected_dependencies: string[];
   detected_characteristics: string[];
+  files_scanned: number;
   issues: Issue[];
 }
 

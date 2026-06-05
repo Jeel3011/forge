@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ project_type | replace("_", "-") }}-api
+  labels:
+    app: {{ project_type | replace("_", "-") }}-api
+spec:
+  replicas: {{ workers }}
+  selector:
+    matchLabels:
+      app: {{ project_type | replace("_", "-") }}-api
+  template:
+    metadata:
+      labels:
+        app: {{ project_type | replace("_", "-") }}-api
+    spec:
+      containers:
+        - name: api
+          image: YOUR_REGISTRY/{{ project_type | replace("_", "-") }}-api:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: {{ project_type | replace("_", "-") }}-config
+            - secretRef:
+                name: {{ project_type | replace("_", "-") }}-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "{{ memory_limit }}"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+{% if needs_gpu %}
+          runtimeClassName: nvidia
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+{% endif %}
+{% if needs_celery %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ project_type | replace("_", "-") }}-worker
+  labels:
+    app: {{ project_type | replace("_", "-") }}-worker
+spec:
+  replicas: {{ workers }}
+  selector:
+    matchLabels:
+      app: {{ project_type | replace("_", "-") }}-worker
+  template:
+    metadata:
+      labels:
+        app: {{ project_type | replace("_", "-") }}-worker
+    spec:
+      containers:
+        - name: worker
+          image: YOUR_REGISTRY/{{ project_type | replace("_", "-") }}-api:latest
+          command:
+            - celery
+            - -A
+            - app.celery
+            - worker
+            - --concurrency={{ workers }}
+            - -Q
+            - default
+            - --time-limit={{ celery_time_limit }}
+            - --soft-time-limit={{ celery_time_limit - 60 }}
+          envFrom:
+            - configMapRef:
+                name: {{ project_type | replace("_", "-") }}-config
+            - secretRef:
+                name: {{ project_type | replace("_", "-") }}-secrets
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "{{ memory_limit }}"
+              cpu: "2000m"
+{% endif %}

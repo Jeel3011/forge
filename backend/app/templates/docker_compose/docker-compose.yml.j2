@@ -70,10 +70,12 @@ services:
     restart: unless-stopped
 {% endif %}
 
+{% if needs_redis or needs_qdrant %}
 volumes:
 {% if needs_redis %}
   redis_data:
 {% endif %}
 {% if needs_qdrant %}
   qdrant_data:
+{% endif %}
 {% endif %}
