@@ -50,7 +50,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-forge-bg flex flex-col items-center justify-center px-6 relative">
       {/* Grid */}
-      <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-100 pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+        backgroundSize: "40px 40px",
+      }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-xl space-y-10" style={{ animation: "fadeUp 0.5s ease both" }}>

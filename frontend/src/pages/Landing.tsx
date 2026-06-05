@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TerminalDemo } from "../components/TerminalDemo";
 import { StepCard } from "../components/StepCard";
 import { FeatureRow } from "../components/FeatureRow";
@@ -10,6 +10,7 @@ import { useReveal } from "../hooks/useReveal";
 function Hero() {
   const [url, setUrl] = useState("");
   const heroRef = useRef<HTMLElement>(null);
+  const navigate = useNavigate();
 
   // Subtle parallax on scroll
   useEffect(() => {
@@ -29,8 +30,13 @@ function Hero() {
     >
       {/* Grid background */}
       <div
-        className="absolute inset-0 bg-grid-pattern bg-grid opacity-100"
-        style={{ transform: "translateY(var(--scroll-y, 0))" }}
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+          transform: "translateY(var(--scroll-y, 0))",
+        }}
       />
 
       {/* Radial vignette */}
@@ -77,15 +83,16 @@ function Hero() {
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && navigate(url.trim() ? `/app?repo=${encodeURIComponent(url.trim())}` : "/app")}
               placeholder="github.com/you/your-ai-project"
               className="forge-input flex-1"
             />
-            <Link
-              to={url.trim() ? `/app?repo=${encodeURIComponent(url)}` : "/app"}
+            <button
+              onClick={() => navigate(url.trim() ? `/app?repo=${encodeURIComponent(url.trim())}` : "/app")}
               className="forge-btn-primary whitespace-nowrap"
             >
               Scan free →
-            </Link>
+            </button>
           </div>
           <p className="text-xs text-forge-muted">No sign-up required · 3 free scans/month</p>
         </div>
@@ -131,7 +138,7 @@ function Hero() {
 // ─── Logos / trust bar ───────────────────────────────────────────────────────
 
 function TrustBar() {
-  const ref = useReveal(0.1) as React.RefObject<HTMLElement>;
+  const ref = useReveal<HTMLElement>(0.1);
   const labels = ["FastAPI", "LangChain", "PyTorch", "Celery", "Docker", "Kubernetes", "Terraform", "Redis"];
 
   return (
@@ -224,8 +231,8 @@ const STEPS = [
 ];
 
 function HowItWorks() {
-  const headRef = useReveal() as React.RefObject<HTMLDivElement>;
-  const gridRef = useReveal(0.05) as React.RefObject<HTMLDivElement>;
+  const headRef = useReveal<HTMLDivElement>();
+  const gridRef = useReveal<HTMLDivElement>(0.05);
 
   return (
     <section id="how" className="py-28 px-6">
@@ -295,9 +302,9 @@ const DIAGNOSE_EXAMPLE = `[CRITICAL] Model loaded on every request
   [Approve]  [Skip]`;
 
 function Features() {
-  const r1 = useReveal() as React.RefObject<HTMLDivElement>;
-  const r2 = useReveal() as React.RefObject<HTMLDivElement>;
-  const r3 = useReveal() as React.RefObject<HTMLDivElement>;
+  const r1 = useReveal<HTMLDivElement>();
+  const r2 = useReveal<HTMLDivElement>();
+  const r3 = useReveal<HTMLDivElement>();
 
   return (
     <section id="features" className="py-28 px-6 border-t border-forge-border">
@@ -375,7 +382,7 @@ const ROWS = [
 ];
 
 function Comparison() {
-  const ref = useReveal(0.05) as React.RefObject<HTMLElement>;
+  const ref = useReveal<HTMLElement>(0.05);
 
   const cell = (v: boolean | string) => {
     if (v === true) return <span className="text-forge-light font-medium">✓</span>;
@@ -475,7 +482,7 @@ const PLANS = [
 ];
 
 function Pricing() {
-  const ref = useReveal(0.05) as React.RefObject<HTMLElement>;
+  const ref = useReveal<HTMLElement>(0.05);
 
   return (
     <section id="pricing" ref={ref} className="reveal py-28 px-6 border-t border-forge-border">
@@ -542,7 +549,7 @@ function Pricing() {
 // ─── Final CTA ────────────────────────────────────────────────────────────────
 
 function FinalCTA() {
-  const ref = useReveal() as React.RefObject<HTMLElement>;
+  const ref = useReveal<HTMLElement>();
 
   return (
     <section ref={ref} className="reveal py-28 px-6 border-t border-forge-border">
